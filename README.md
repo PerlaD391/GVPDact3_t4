@@ -184,27 +184,31 @@ curl http://13.140.226.55:8084/api/eventos
 
 ### Mis entidades y su relación
 
-![Listado de categorías](docs/categorias.png)
+![Listado de categorías](docs/Captura%20de%20pantalla%202026-11-10%20223738.png)
+
+### Eventos de una categoría (la relación)
+
+![Eventos de la categoría Música](docs/Captura%20de%20pantalla%202026-11-10%20223658.png)
 
 ### Crear un evento (POST 201)
 
-![Crear evento en Postman](docs/crear-evento.png)
+![Crear evento en Postman](docs/Captura%20de%20pantalla%202026-11-10%20223709.png)
 
 ### Listar eventos con su categoría
 
-![Listado de eventos](docs/lista.png)
+![Listado de eventos](docs/Captura%20de%20pantalla%202026-11-10%20223606.png)
 
 ### Detalle con el nombre de la categoría
 
-![Detalle del evento](docs/detalle.png)
+![Detalle del evento](docs/Captura%20de%20pantalla%202026-11-10%20223910.png)
 
 ### Actualizar un evento (PUT 200)
 
-![Actualizar evento en Postman](docs/actualizar-evento.png)
+![Actualizar evento en Postman](docs/Captura%20de%20pantalla%202026-11-10%20223718.png)
 
 ### Eliminar un evento (DELETE 204)
 
-![Eliminar evento en Postman](docs/eliminar-evento.png)
+![Eliminar evento en Postman](docs/Captura%20de%20pantalla%202026-11-10%20223728.png)
 
 ## Cómo está organizado mi proyecto
 
