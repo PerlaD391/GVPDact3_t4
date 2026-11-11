@@ -1,39 +1,42 @@
-# GVPDact3_t4 — CulturaVibe en Spring Boot + JPA + MySQL
+# Act3 — CRUD en Spring Boot con JPA y MySQL (CulturaVibe)
 
-Act3. CRUD en Spring Boot y Relaciones (sin frontend separado).
-Programación Web, equipo 13.
+Este es mi proyecto de la Actividad 3 de Programación Web (equipo 13).
+Hice un CRUD completo en Spring Boot conectado a una base de datos real en
+MySQL, con dos entidades relacionadas entre sí. También tiene sus propias
+vistas dentro del mismo proyecto y lo probé con Postman.
 
 **Autora:** Perla Danae Gallardo Vasquez (GVPD)
 
 ## Enlaces en vivo (VPS)
 
-- Cartelera (vistas Thymeleaf): http://13.140.226.55:8084/eventos
+- Cartelera (vistas): http://13.140.226.55:8084/eventos
 - API de eventos: http://13.140.226.55:8084/api/eventos
 - API de categorías: http://13.140.226.55:8084/api/categorias
 - Act1 (sigue corriendo): http://13.140.226.55:8081/api/proyecto
 - Act2 (sigue corriendo): http://13.140.226.55:8083/eventos
 
-## Entidades y relación
+## Mis entidades y su relación
 
-Dos entidades relacionadas con JPA, sobre el tema de CulturaVibe:
+Yo elegí dos entidades: `Evento` y `Categoría`.
 
 | Entidad | Tabla | Campos |
 |---|---|---|
 | `Categoria` | `categorias` | id, nombre (único), descripcion |
 | `Evento` | `eventos` | id, nombre, fecha, hora, sede, direccion, ciudad, estado, precio, estadoVenta, descripcion, artistas, url |
 
-Relación **muchos a uno**: muchos eventos pertenecen a una categoría
-(`Evento` → `@ManyToOne` → `Categoria`, llave foránea `categoria_id`);
-una categoría tiene muchos eventos (`Categoria` → `@OneToMany`).
-Al consultar un evento, la respuesta trae el **nombre de su categoría**
-(`categoriaNombre`), no solo su id. Los artistas se guardan en la tabla
-`evento_artistas` con `@ElementCollection`.
+La relación es de **muchos a uno**: muchos eventos pertenecen a una
+categoría y una categoría tiene muchos eventos. En el código, `Evento`
+tiene `@ManyToOne` hacia `Categoría` y la llave foránea es `categoria_id`;
+`Categoría` tiene `@OneToMany` del otro lado. Cuando consultas un evento,
+la respuesta trae el **nombre de su categoría** (`categoriaNombre`), no
+solo su id. Los artistas se guardan aparte en la tabla `evento_artistas`
+con `@ElementCollection`.
 
 ## Endpoints
 
 ### Eventos (`/api/eventos`)
 
-| Método | Ruta | Descripción | Respuesta |
+| Método | Ruta | Para qué sirve | Respuesta |
 |---|---|---|---|
 | GET | `/api/eventos?page=0&size=12` | Listar con paginación | 200 |
 | GET | `/api/eventos/categoria/{categoriaId}` | Listar por categoría | 200 |
@@ -44,7 +47,7 @@ Al consultar un evento, la respuesta trae el **nombre de su categoría**
 
 ### Categorías (`/api/categorias`)
 
-| Método | Ruta | Descripción | Respuesta |
+| Método | Ruta | Para qué sirve | Respuesta |
 |---|---|---|---|
 | GET | `/api/categorias` | Listar categorías | 200 |
 | GET | `/api/categorias/{id}` | Ver una categoría | 200 / 404 |
@@ -52,20 +55,20 @@ Al consultar un evento, la respuesta trae el **nombre de su categoría**
 | PUT | `/api/categorias/{id}` | Actualizar una categoría | 200 / 404 |
 | DELETE | `/api/categorias/{id}` | Eliminar una categoría | 204 / 404 / 409 si tiene eventos |
 
-### Vistas (Thymeleaf, mismo proyecto)
+### Vistas (Thymeleaf, en el mismo proyecto)
 
-| Ruta | Vista |
+| Ruta | Qué se ve |
 |---|---|
 | `/` | Redirige a `/eventos` |
 | `/eventos` | Lista paginada de eventos con su categoría |
 | `/eventos/{id}` | Detalle de un evento con su categoría |
 
-Los datos de entrada se validan con `@Valid` y Bean Validation
-(`@NotBlank`, `@NotNull`): si algo falta, la API responde **400** con
-los campos que fallaron. Los DTOs controlan qué datos entran y salen;
-la entidad nunca se expone directamente.
+Los datos que entran se validan con `@Valid` (`@NotBlank`, `@NotNull`):
+si falta algo, la API responde **400** diciendo qué campo falló. Yo uso
+DTOs para controlar qué datos entran y salen; la entidad nunca se expone
+directamente.
 
-Ejemplo de creación (POST `/api/eventos`):
+Ejemplo de lo que mando para crear un evento (POST `/api/eventos`):
 
 ```json
 {
@@ -85,19 +88,19 @@ Ejemplo de creación (POST `/api/eventos`):
 }
 ```
 
-Respuesta: **201 Created** con el evento creado, incluyendo
+Y me responde **201 Created** con el evento creado, incluyendo
 `categoriaNombre: "Música"`.
 
 ## Base de datos
 
-MySQL real. Las tablas se crean solas al arrancar
-(`spring.jpa.hibernate.ddl-auto=update`). La primera vez, el proyecto
-siembra 5 categorías (Música, Cine, Arte, Libros, Teatro) y 6 eventos.
+Usé MySQL real. Las tablas se crean solas al arrancar el proyecto
+(`spring.jpa.hibernate.ddl-auto=update`). La primera vez se guardan solas
+5 categorías (Música, Cine, Arte, Libros, Teatro) y 6 eventos.
 
-Las credenciales **no** están en el repositorio: se pasan con variables
+Las contraseñas **no** están en el repositorio: se pasan con variables
 de entorno (`DB_URL`, `DB_USER`, `DB_PASSWORD`).
 
-### Instalar MySQL en el VPS
+### Cómo instalé MySQL en el VPS
 
 ```bash
 sudo apt update
@@ -106,9 +109,9 @@ sudo systemctl status mysql
 sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'TU_CONTRASENA'; FLUSH PRIVILEGES;"
 ```
 
-### Correr en local (para pruebas en tu máquina)
+### Cómo lo corro en mi máquina
 
-Requisitos: JDK 17 (Maven no hace falta instalarlo, el proyecto trae el
+Necesito JDK 17 (Maven no hace falta instalarlo, el proyecto trae el
 Maven Wrapper) y MySQL corriendo en local con la base `culturavibe_act3`
 (se crea sola). El servidor levanta en `http://localhost:8084`.
 
@@ -118,24 +121,23 @@ $env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.1"
 java -jar target\gvpdact3-t4-0.0.1-SNAPSHOT.jar
 ```
 
-Si tu MySQL local tiene contraseña, pásala así:
+Si mi MySQL local tiene contraseña, la paso así antes de correrlo:
 
 ```powershell
 $env:DB_PASSWORD="tu_contrasena"
-.\mvnw.cmd clean package
 ```
 
-## Probar con Postman
+## Cómo lo probé (Postman)
 
-La colección está en la carpeta `postman/` de este repo. En Postman,
-**Import → Files** y selecciona estos dos archivos:
+La colección está en la carpeta `postman/` de este repo. En Postman voy
+a **Import → Files** y elijo estos dos archivos:
 
 - `postman/CulturaVibe-Act3.postman_collection.json` (las 8 peticiones)
 - `postman/CulturaVibe-Act3-VPS.postman_environment.json` (para probar
   contra el VPS) o `postman/CulturaVibe-Act3-Local.postman_environment.json`
-  (para probar en tu máquina)
+  (para probar en mi máquina)
 
-Elige el entorno arriba a la derecha y corre las peticiones en este orden:
+Elijo el entorno arriba a la derecha y corro las peticiones en este orden:
 
 1. Categorías → Listar categorias
 2. Categorías → Crear categoria
@@ -146,8 +148,7 @@ Elige el entorno arriba a la derecha y corre las peticiones en este orden:
 7. Eventos → Listar por categoria (la relación: solo eventos de Música)
 8. Eventos → Eliminar evento (204)
 
-La colección de Bruno sigue en la carpeta `bruno/` por si la prefieres;
-la entrega usa Postman.
+La colección de Bruno ya no está en el repo, yo lo probé todo con Postman.
 
 También se puede probar con curl:
 
@@ -156,7 +157,7 @@ curl http://13.140.226.55:8084/api/eventos?page=0&size=12
 curl http://13.140.226.55:8084/api/eventos/1
 ```
 
-## Despliegue en el VPS
+## Cómo lo desplegué en el VPS
 
 ```bash
 sudo ufw allow 8084/tcp
@@ -171,7 +172,7 @@ export DB_PASSWORD="tu_contrasena_mysql"
 nohup java -jar gvpdact3-t4-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 ```
 
-Verificar que las tres actividades sigan vivas:
+Para verificar que las tres actividades sigan vivas:
 
 ```bash
 curl http://13.140.226.55:8081/api/proyecto
@@ -181,7 +182,7 @@ curl http://13.140.226.55:8084/api/eventos
 
 ## Capturas de pantalla
 
-### Entidades y relación
+### Mis entidades y su relación
 
 ![Listado de categorías](docs/categorias.png)
 
@@ -205,7 +206,7 @@ curl http://13.140.226.55:8084/api/eventos
 
 ![Eliminar evento en Postman](docs/eliminar-evento.png)
 
-## Estructura del proyecto
+## Cómo está organizado mi proyecto
 
 ```text
 src/main/java/mx/culturavibe/act3/
@@ -222,7 +223,7 @@ src/main/java/mx/culturavibe/act3/
 ├── servicio/
 │   ├── CategoriaService.java
 │   ├── EventoService.java
-│   └── DataInitializer.java  # siembra 5 categorías y 6 eventos
+│   └── DataInitializer.java  # guarda 5 categorías y 6 eventos al inicio
 ├── controlador/
 │   ├── CategoriaController.java  # REST /api/categorias
 │   ├── EventoController.java     # REST /api/eventos
