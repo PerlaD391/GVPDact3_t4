@@ -1,0 +1,224 @@
+# GVPDact3_t4 — CulturaVibe en Spring Boot + JPA + MySQL
+
+Act3. CRUD en Spring Boot y Relaciones (sin frontend separado).
+Programación Web, equipo 13.
+
+**Autora:** Perla Danae Gallardo Vasquez (GVPD)
+
+## Enlaces en vivo (VPS)
+
+- Cartelera (vistas Thymeleaf): http://13.140.226.55:8084/eventos
+- API de eventos: http://13.140.226.55:8084/api/eventos
+- API de categorías: http://13.140.226.55:8084/api/categorias
+- Act1 (sigue corriendo): http://13.140.226.55:8081/api/proyecto
+- Act2 (sigue corriendo): http://13.140.226.55:8083/eventos
+
+## Entidades y relación
+
+Dos entidades relacionadas con JPA, sobre el tema de CulturaVibe:
+
+| Entidad | Tabla | Campos |
+|---|---|---|
+| `Categoria` | `categorias` | id, nombre (único), descripcion |
+| `Evento` | `eventos` | id, nombre, fecha, hora, sede, direccion, ciudad, estado, precio, estadoVenta, descripcion, artistas, url |
+
+Relación **muchos a uno**: muchos eventos pertenecen a una categoría
+(`Evento` → `@ManyToOne` → `Categoria`, llave foránea `categoria_id`);
+una categoría tiene muchos eventos (`Categoria` → `@OneToMany`).
+Al consultar un evento, la respuesta trae el **nombre de su categoría**
+(`categoriaNombre`), no solo su id. Los artistas se guardan en la tabla
+`evento_artistas` con `@ElementCollection`.
+
+## Endpoints
+
+### Eventos (`/api/eventos`)
+
+| Método | Ruta | Descripción | Respuesta |
+|---|---|---|---|
+| GET | `/api/eventos?page=0&size=12` | Listar con paginación | 200 |
+| GET | `/api/eventos/categoria/{categoriaId}` | Listar por categoría | 200 |
+| GET | `/api/eventos/{id}` | Ver un evento | 200 / 404 |
+| POST | `/api/eventos` | Crear un evento | 201 |
+| PUT | `/api/eventos/{id}` | Actualizar un evento | 200 / 404 |
+| DELETE | `/api/eventos/{id}` | Eliminar un evento | 204 / 404 |
+
+### Categorías (`/api/categorias`)
+
+| Método | Ruta | Descripción | Respuesta |
+|---|---|---|---|
+| GET | `/api/categorias` | Listar categorías | 200 |
+| GET | `/api/categorias/{id}` | Ver una categoría | 200 / 404 |
+| POST | `/api/categorias` | Crear una categoría | 201 |
+| PUT | `/api/categorias/{id}` | Actualizar una categoría | 200 / 404 |
+| DELETE | `/api/categorias/{id}` | Eliminar una categoría | 204 / 404 / 409 si tiene eventos |
+
+### Vistas (Thymeleaf, mismo proyecto)
+
+| Ruta | Vista |
+|---|---|
+| `/` | Redirige a `/eventos` |
+| `/eventos` | Lista paginada de eventos con su categoría |
+| `/eventos/{id}` | Detalle de un evento con su categoría |
+
+Los datos de entrada se validan con `@Valid` y Bean Validation
+(`@NotBlank`, `@NotNull`): si algo falta, la API responde **400** con
+los campos que fallaron. Los DTOs controlan qué datos entran y salen;
+la entidad nunca se expone directamente.
+
+Ejemplo de creación (POST `/api/eventos`):
+
+```json
+{
+  "nombre": "Concierto de Prueba",
+  "fecha": "2026-12-15",
+  "hora": "18:00",
+  "sede": "Teatro Prueba",
+  "direccion": "Calle Prueba 5",
+  "ciudad": "Puebla",
+  "estado": "PUE",
+  "categoriaId": 1,
+  "precio": "$150",
+  "estadoVenta": "onsale",
+  "descripcion": "Concierto creado desde Bruno",
+  "artistas": ["Compañía Prueba"],
+  "url": "https://www.ticketmaster.com.mx"
+}
+```
+
+Respuesta: **201 Created** con el evento creado, incluyendo
+`categoriaNombre: "Música"`.
+
+## Base de datos
+
+MySQL real. Las tablas se crean solas al arrancar
+(`spring.jpa.hibernate.ddl-auto=update`). La primera vez, el proyecto
+siembra 5 categorías (Música, Cine, Arte, Libros, Teatro) y 6 eventos.
+
+Las credenciales **no** están en el repositorio: se pasan con variables
+de entorno (`DB_URL`, `DB_USER`, `DB_PASSWORD`).
+
+### Instalar MySQL en el VPS
+
+```bash
+sudo apt update
+sudo apt install -y mysql-server
+sudo systemctl status mysql
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'TU_CONTRASENA'; FLUSH PRIVILEGES;"
+```
+
+### Correr en local (para pruebas en tu máquina)
+
+Requisitos: JDK 17 (Maven no hace falta instalarlo, el proyecto trae el
+Maven Wrapper) y MySQL corriendo en local con la base `culturavibe_act3`
+(se crea sola). El servidor levanta en `http://localhost:8084`.
+
+```powershell
+$env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.1"
+.\mvnw.cmd clean package
+java -jar target\gvpdact3-t4-0.0.1-SNAPSHOT.jar
+```
+
+Si tu MySQL local tiene contraseña, pásala así:
+
+```powershell
+$env:DB_PASSWORD="tu_contrasena"
+.\mvnw.cmd clean package
+```
+
+## Probar con Bruno
+
+La colección está en la carpeta `bruno/` de este repo. Ábrela en Bruno
+(Open Collection → selecciona la carpeta `bruno`), elige el entorno
+**Local** o **VPS** y corre las peticiones en este orden:
+
+1. Categorías → Listar categorias
+2. Categorías → Crear categoria
+3. Eventos → Listar eventos
+4. Eventos → Ver evento
+5. Eventos → Crear evento (201)
+6. Eventos → Actualizar evento
+7. Eventos → Listar por categoria (la relación: solo eventos de Música)
+8. Eventos → Eliminar evento (204)
+
+También se puede probar con curl:
+
+```bash
+curl http://13.140.226.55:8084/api/eventos?page=0&size=12
+curl http://13.140.226.55:8084/api/eventos/1
+```
+
+## Despliegue en el VPS
+
+```bash
+sudo ufw allow 8084/tcp
+mkdir -p /opt/springboot-act3
+scp target\gvpdact3-t4-0.0.1-SNAPSHOT.jar root@13.140.226.55:/opt/springboot-act3/
+```
+
+En el VPS, dentro de `/opt/springboot-act3/`:
+
+```bash
+export DB_PASSWORD="tu_contrasena_mysql"
+nohup java -jar gvpdact3-t4-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+```
+
+Verificar que las tres actividades sigan vivas:
+
+```bash
+curl http://13.140.226.55:8081/api/proyecto
+curl http://13.140.226.55:8083/eventos
+curl http://13.140.226.55:8084/api/eventos
+```
+
+## Capturas de pantalla
+
+### Entidades y relación
+
+![Listado de categorías](docs/categorias.png)
+
+### Crear un evento (POST 201)
+
+![Crear evento en Bruno](docs/crear-evento.png)
+
+### Listar eventos con su categoría
+
+![Listado de eventos](docs/lista.png)
+
+### Detalle con el nombre de la categoría
+
+![Detalle del evento](docs/detalle.png)
+
+### Actualizar un evento (PUT 200)
+
+![Actualizar evento en Bruno](docs/actualizar-evento.png)
+
+### Eliminar un evento (DELETE 204)
+
+![Eliminar evento en Bruno](docs/eliminar-evento.png)
+
+## Estructura del proyecto
+
+```text
+src/main/java/mx/culturavibe/act3/
+├── CulturavibeAct3Application.java
+├── modelo/
+│   ├── Categoria.java        # @Entity, @OneToMany
+│   └── Evento.java           # @Entity, @ManyToOne, @ElementCollection
+├── dto/
+│   ├── CategoriaDTO.java     # @Valid
+│   └── EventoDTO.java        # @Valid, categoriaId + categoriaNombre
+├── repositorio/
+│   ├── CategoriaRepository.java
+│   └── EventoRepository.java # JpaRepository + findByCategoriaId
+├── servicio/
+│   ├── CategoriaService.java
+│   ├── EventoService.java
+│   └── DataInitializer.java  # siembra 5 categorías y 6 eventos
+├── controlador/
+│   ├── CategoriaController.java  # REST /api/categorias
+│   ├── EventoController.java     # REST /api/eventos
+│   ├── EventoVistaController.java # Thymeleaf /eventos
+│   └── HomeController.java
+└── config/
+    └── GlobalExceptionHandler.java # 404, 400, 409
+```

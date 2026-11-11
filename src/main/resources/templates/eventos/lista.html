@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${nombreApp} + ' - Cartelera de eventos'">CulturaVibe - Cartelera de eventos</title>
+<style>
+body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; margin: 0; }
+header { background: #1e293b; padding: 20px 32px; border-bottom: 1px solid #334155; }
+header h1 { margin: 0; font-size: 26px; color: #f8fafc; }
+header p { margin: 4px 0 0; color: #94a3b8; }
+main { max-width: 960px; margin: 0 auto; padding: 24px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; }
+.card h2 { margin: 0 0 6px; font-size: 18px; }
+.card h2 a { color: #f8fafc; text-decoration: none; }
+.card h2 a:hover { text-decoration: underline; }
+.badge { display: inline-block; background: #7c3aed; color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+.meta { color: #94a3b8; font-size: 14px; margin: 6px 0; }
+.pager { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 24px; }
+.pager a { color: #a78bfa; text-decoration: none; }
+.pager span { color: #94a3b8; }
+footer { text-align: center; color: #64748b; font-size: 13px; padding: 24px; }
+</style>
+</head>
+<body>
+<header>
+<h1 th:text="${nombreApp}">CulturaVibe</h1>
+<p th:text="'Cartelera de eventos - ' + ${autora}">Cartelera de eventos</p>
+</header>
+<main>
+<div class="grid">
+<div class="card" th:each="evento : ${eventos}">
+<h2><a th:href="@{/eventos/{id}(id=${evento.id})}" th:text="${evento.nombre}">Nombre del evento</a></h2>
+<span class="badge" th:text="${evento.categoriaNombre}">Categoría</span>
+<p class="meta" th:text="${evento.fecha} + ' · ' + ${evento.hora} + ' · ' + ${evento.sede}">Fecha · Hora · Sede</p>
+<p class="meta" th:text="${evento.ciudad} + ', ' + ${evento.estado}">Ciudad, Estado</p>
+<p class="meta" th:text="${evento.precio}">Precio</p>
+</div>
+</div>
+<div class="pager" th:if="${pagina.totalPages > 1}">
+<a th:if="${pagina.hasPrevious()}" th:href="@{/eventos(page=${pagina.number - 1})}">← Anterior</a>
+<span th:text="'Página ' + (${pagina.number + 1}) + ' de ' + ${pagina.totalPages}">Página 1 de 1</span>
+<a th:if="${pagina.hasNext()}" th:href="@{/eventos(page=${pagina.number + 1})}">Siguiente →</a>
+</div>
+</main>
+<footer th:text="${nombreApp} + ' - Act3 · CRUD con JPA y MySQL'">CulturaVibe - Act3</footer>
+</body>
+</html>

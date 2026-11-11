@@ -1,0 +1,27 @@
+meta {
+  name: Crear evento
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/eventos
+  body: json
+  auth: none
+}
+
+body:json {
+  "nombre": "Concierto de Prueba",
+  "fecha": "2026-12-15",
+  "hora": "18:00",
+  "sede": "Teatro Prueba",
+  "direccion": "Calle Prueba 5",
+  "ciudad": "Puebla",
+  "estado": "PUE",
+  "categoriaId": 1,
+  "precio": "$150",
+  "estadoVenta": "onsale",
+  "descripcion": "Concierto creado desde Bruno",
+  "artistas": ["Compañía Prueba"],
+  "url": "https://www.ticketmaster.com.mx"
+}

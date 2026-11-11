@@ -1,0 +1,11 @@
+meta {
+  name: Listar eventos
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/eventos?page=0&size=12
+  body: none
+  auth: none
+}

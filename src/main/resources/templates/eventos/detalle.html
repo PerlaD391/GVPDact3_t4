@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${evento.nombre} + ' - ' + ${nombreApp}">Detalle del evento</title>
+<style>
+body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; margin: 0; }
+header { background: #1e293b; padding: 20px 32px; border-bottom: 1px solid #334155; }
+header h1 { margin: 0; font-size: 26px; color: #f8fafc; }
+header p { margin: 4px 0 0; color: #94a3b8; }
+main { max-width: 720px; margin: 0 auto; padding: 24px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; }
+.card h2 { margin: 0 0 8px; font-size: 24px; }
+.badge { display: inline-block; background: #7c3aed; color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 12px; }
+dl { display: grid; grid-template-columns: 140px 1fr; row-gap: 8px; margin-top: 16px; }
+dt { color: #94a3b8; }
+dd { margin: 0; }
+a.volver { color: #a78bfa; text-decoration: none; }
+footer { text-align: center; color: #64748b; font-size: 13px; padding: 24px; }
+</style>
+</head>
+<body>
+<header>
+<h1 th:text="${nombreApp}">CulturaVibe</h1>
+<p th:text="'Detalle del evento - ' + ${autora}">Detalle del evento</p>
+</header>
+<main>
+<p><a class="volver" href="/eventos">← Volver a la cartelera</a></p>
+<div class="card">
+<h2 th:text="${evento.nombre}">Nombre del evento</h2>
+<span class="badge" th:text="${evento.categoriaNombre}">Categoría</span>
+<dl>
+<dt>Fecha</dt><dd th:text="${evento.fecha} + ' · ' + ${evento.hora}">Fecha · Hora</dd>
+<dt>Sede</dt><dd th:text="${evento.sede} + ' — ' + ${evento.direccion}">Sede</dd>
+<dt>Ciudad</dt><dd th:text="${evento.ciudad} + ', ' + ${evento.estado}">Ciudad, Estado</dd>
+<dt>Precio</dt><dd th:text="${evento.precio}">Precio</dd>
+<dt>Venta</dt><dd th:text="${evento.estadoVenta}">onsale</dd>
+<dt>Artistas</dt><dd th:text="${#strings.listJoin(evento.artistas, ', ')}">Artistas</dd>
+<dt>Descripción</dt><dd th:text="${evento.descripcion}">Descripción</dd>
+<dt>Enlace</dt><dd><a class="volver" th:href="${evento.url}" target="_blank" th:text="${evento.url}">Ticketmaster</a></dd>
+</dl>
+</div>
+</main>
+<footer th:text="${nombreApp} + ' - Act3 · CRUD con JPA y MySQL'">CulturaVibe - Act3</footer>
+</body>
+</html>
