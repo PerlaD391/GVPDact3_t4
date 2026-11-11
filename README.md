@@ -79,7 +79,7 @@ Ejemplo de creación (POST `/api/eventos`):
   "categoriaId": 1,
   "precio": "$150",
   "estadoVenta": "onsale",
-  "descripcion": "Concierto creado desde Bruno",
+  "descripcion": "Concierto creado desde Postman",
   "artistas": ["Compañía Prueba"],
   "url": "https://www.ticketmaster.com.mx"
 }
@@ -125,11 +125,17 @@ $env:DB_PASSWORD="tu_contrasena"
 .\mvnw.cmd clean package
 ```
 
-## Probar con Bruno
+## Probar con Postman
 
-La colección está en la carpeta `bruno/` de este repo. Ábrela en Bruno
-(Open Collection → selecciona la carpeta `bruno`), elige el entorno
-**Local** o **VPS** y corre las peticiones en este orden:
+La colección está en la carpeta `postman/` de este repo. En Postman,
+**Import → Files** y selecciona estos dos archivos:
+
+- `postman/CulturaVibe-Act3.postman_collection.json` (las 8 peticiones)
+- `postman/CulturaVibe-Act3-VPS.postman_environment.json` (para probar
+  contra el VPS) o `postman/CulturaVibe-Act3-Local.postman_environment.json`
+  (para probar en tu máquina)
+
+Elige el entorno arriba a la derecha y corre las peticiones en este orden:
 
 1. Categorías → Listar categorias
 2. Categorías → Crear categoria
@@ -139,6 +145,9 @@ La colección está en la carpeta `bruno/` de este repo. Ábrela en Bruno
 6. Eventos → Actualizar evento
 7. Eventos → Listar por categoria (la relación: solo eventos de Música)
 8. Eventos → Eliminar evento (204)
+
+La colección de Bruno sigue en la carpeta `bruno/` por si la prefieres;
+la entrega usa Postman.
 
 También se puede probar con curl:
 
@@ -178,7 +187,7 @@ curl http://13.140.226.55:8084/api/eventos
 
 ### Crear un evento (POST 201)
 
-![Crear evento en Bruno](docs/crear-evento.png)
+![Crear evento en Postman](docs/crear-evento.png)
 
 ### Listar eventos con su categoría
 
@@ -190,11 +199,11 @@ curl http://13.140.226.55:8084/api/eventos
 
 ### Actualizar un evento (PUT 200)
 
-![Actualizar evento en Bruno](docs/actualizar-evento.png)
+![Actualizar evento en Postman](docs/actualizar-evento.png)
 
 ### Eliminar un evento (DELETE 204)
 
-![Eliminar evento en Bruno](docs/eliminar-evento.png)
+![Eliminar evento en Postman](docs/eliminar-evento.png)
 
 ## Estructura del proyecto
 
